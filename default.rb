@@ -116,8 +116,8 @@ CODE
 #devise
 if yes?('Use devise?')
   gem 'devise'
-  generate 'rails g devise:install'
-  generate 'rails g devise User'
+  generate 'devise:install'
+  generate 'devise User'
   generate 'devise:controller users'
   generate 'devise:views'
 end
