@@ -21,8 +21,15 @@ gem 'jquery-ui-rails'
 gem 'font-awesome-rails'
 gem 'simple_form'
 gem 'carrierwave'
+gem 'faker'
 
 group :development, :test do
+  gem 'rspec-rails'
+  gem 'factory_bot_rails'
+  gem 'capybara'
+  gem 'selenium-webdriver'
+  gem 'chromedriver-helper'
+  gem 'launchy'
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
 end
 
@@ -31,12 +38,6 @@ group :development do
   gem 'listen', '>= 3.0.5', '< 3.2'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
-end
-
-group :test do
-  gem 'capybara', '>= 2.15', '< 4.0'
-  gem 'selenium-webdriver'
-  gem 'chromedriver-helper'
 end
 
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
@@ -78,12 +79,16 @@ application do
     config.active_record.default_timezone = :local
 
     config.i18n.default_locale = :ja
+
+    config.generators do |g|
+      g.test_framework :rspec, view_specs: false, helper_specs: false, routing_specs: false
+    end
   }
 end
 
 #set japanese
-run 'curl -o config/locales/ja.yml https://raw.github.com/svenfuchs/rails-i18n/master/rails/locale/ja.yml'
-run 'curl -o config/locales/devise.ja.yml https://raw.githubusercontent.com/tigrish/devise-i18n/master/rails/locales/ja.yml'
+run 'curl -s https://raw.githubusercontent.com/svenfuchs/rails-i18n/master/rails/locale/ja.yml -o config/locales/ja.yml'
+run 'curl -s https://raw.githubusercontent.com/tigrish/devise-i18n/master/rails/locales/ja.yml -o config/locales/devise.ja.yml '
 
 #Simple Form
 generate 'simple_form:install --bootstrap'
@@ -118,7 +123,7 @@ if yes?('Use devise?')
   gem 'devise'
   generate 'devise:install'
   generate 'devise User'
-  generate 'devise:controller users'
+  generate 'devise:controllers users'
   generate 'devise:views'
 end
 
@@ -132,4 +137,15 @@ if yes?('Use GitHub?')
   github_url = ask('GitHubのリモートリポジトリのURLを入力してください')
   run "git remote add origin #{github_url}"
 end
+
+#rspec
+generate 'rspec:install'
+
+insert_into_file 'spec/rails_helper.rb', %{
+  config.include FactoryBot::Syntax::Methods
+}, after: 'RSpec.configure do |config|'
+
+insert_into_file '.rspec', %{
+--format documentation
+}, after: '--require spec_helper'
 
